@@ -1,5 +1,6 @@
 package pages;
 
+import org.json.simple.parser.ParseException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
@@ -8,8 +9,10 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.asserts.SoftAssert;
+import util.JSONdata;
 
 import javax.swing.*;
+import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
 
@@ -29,27 +32,38 @@ public class P01_Homepage extends BasePage{
         driver.findElement(searchLocator).sendKeys(Keys.ENTER);
     }
 
-    public void assertOnListOfItemsTitles (String itemTitle){
+    public List<WebElement> listOfItemsTitle (){
+        return driver.findElements(listOfItemsTitleLocator);
+    }
 
-        for (int i = 0; i < driver.findElements(listOfItemsTitleLocator).size()-1 ;i++){
-            System.out.println(driver.findElements(listOfItemsTitleLocator).get(i).getText());
+    public List<WebElement> listOfCheckBoxTransmission (){
+        return driver.findElements(listOfCheckBoxTransmissionLocator);
+    }
+
+    public void assertOnListOfItemsTitles (String itemTitle) throws IOException, ParseException {
+
+        System.out.println("Search Result for Keyword: "+ JSONdata.getTestData("searchKeyword"));
+        for (int i = 0; i < listOfItemsTitle().size() ;i++){
+            System.out.println((i+1) + ") " +listOfItemsTitle().get(i).getText());
+
             WebDriverWait wait = new WebDriverWait(driver,Duration.ofSeconds(10));
-            wait.until(ExpectedConditions.elementToBeClickable(driver.findElements(listOfItemsTitleLocator).get(i)));
-            softAssert.assertTrue(driver.findElements(listOfItemsTitleLocator).get(i).getText().toLowerCase().contains(itemTitle.toLowerCase()));
+            wait.until(ExpectedConditions.elementToBeClickable(listOfItemsTitle().get(i)));
+
+            softAssert.assertTrue(listOfItemsTitle().get(i).getText().toLowerCase().contains(itemTitle.toLowerCase()));
             softAssert.assertAll();
         }
     }
 
     public void printNumberOfObtainedSearchResults (){
-        System.out.println(driver.findElements(listOfItemsTitleLocator).size());
+        System.out.println("Number of obtained Search Results: "+driver.findElements(listOfItemsTitleLocator).size());
     }
 
     public void selectTransmissionByType (String transmissionType){
 
-        for (int i = 0;i < driver.findElements(listOfCheckBoxTransmissionLocator).size();i++){
-            if (driver.findElements(listOfCheckBoxTransmissionLocator).get(i).getAttribute("aria-label").toLowerCase().contains(transmissionType)){
-                System.out.println("Check box: "+driver.findElements(listOfCheckBoxTransmissionLocator).get(i).getAttribute("aria-label").toLowerCase()+" will be selected");
-                driver.findElements(listOfCheckBoxTransmissionLocator).get(i).click();
+        for (int i = 0;i < listOfCheckBoxTransmission().size();i++){
+            if (listOfCheckBoxTransmission().get(i).getAttribute("aria-label").toLowerCase().contains(transmissionType)){
+                System.out.println("Check box: "+ listOfCheckBoxTransmission().get(i).getAttribute("aria-label").toLowerCase()+" will be selected");
+                listOfCheckBoxTransmission().get(i).click();
             }
         }
     }
